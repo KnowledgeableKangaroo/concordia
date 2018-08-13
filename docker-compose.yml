@@ -45,8 +45,6 @@ services:
     volumes:
       - .:/app
       - images_volume:/concordia_images
-    links:
-      - rabbit
     ports:
       - 80:80
 
