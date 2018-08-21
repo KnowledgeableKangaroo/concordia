@@ -61,7 +61,7 @@ DATABASES = {
         "NAME": "concordia",
         "USER": "concordia",
         "PASSWORD": "$(POSTGRESQL_PW)",
-        "HOST": "$(POSTGRESQL_HOST)",
+        "HOST": "db",
         "PORT": "5432",
     }
 }
