@@ -15,17 +15,17 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "concordia",
         "USER": "concordia",
-        "PASSWORD": "concordia",
+        "PASSWORD": "post12345",
         "HOST": "0.0.0.0",
         "PORT": "54321",
     }
 }
 
-ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0"]
+ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "*"]
 
 CELERY_BROKER_URL = "amqp://"
 
-CONCORDIA = {"netloc": "http://0.0.0.0:8000"}
+CONCORDIA = {"netloc": "http://0:80"}
 
 IMPORTER = {
     "BASE_URL": "",
@@ -34,5 +34,7 @@ IMPORTER = {
     "S3_BUCKET_NAME": "",
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = '/tmp/concordia-messages' # change this to a proper location
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = "/tmp/concordia-messages"  # change this to a proper location
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "")
+DEFAULT_TO_EMAIL = DEFAULT_FROM_EMAIL

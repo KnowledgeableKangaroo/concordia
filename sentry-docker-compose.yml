@@ -23,7 +23,7 @@ services:
       - ./postgresql:/docker-entrypoint-initdb.d
       - db_volume:/var/lib/postgresl/data/
     environment:
-        - POSTGRES_MULTIPLE_DATABASES=sentry,concordia
+        - POSTGRES_MULTIPLE_DATABASES=sentry
 
   sentry:
     env_file: ./.env

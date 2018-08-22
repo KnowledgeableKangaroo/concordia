@@ -23,11 +23,15 @@ tx_urlpatterns = (
     [
         re_path(r"^$", views.ConcordiaView.as_view(), name="transcribe"),
         re_path(r"^create/$", views.CollectionView.as_view(), name="create"),
-        re_path(r"^pageinuse/$", views.ConcordiaPageInUse.as_view(), name="page in use"),
-        re_path(r"^alternateasset/$", views.ConcordiaAlternateAssetView.as_view(), name="alternate asset"),
         re_path(
-            r"^([^/]+)/$", views.ConcordiaCollectionView.as_view(), name="collection"
+            r"^pageinuse/$", views.ConcordiaPageInUse.as_view(), name="page in use"
         ),
+        re_path(
+            r"^alternateasset/$",
+            views.ConcordiaAlternateAssetView.as_view(),
+            name="alternate asset",
+        ),
+        re_path(r"^([^/]+)/$", views.ConcordiaProjectView.as_view(), name="collection"),
         re_path(
             r"exportCSV/([^/]+)/$",
             exporter_views.ExportCollectionToCSV.as_view(),
@@ -44,6 +48,11 @@ tx_urlpatterns = (
             name="delete collection",
         ),
         re_path(
+            r"^([^/]+)/delete/asset/([^/]+)/$",
+            views.DeleteAssetView.as_view(),
+            name="delete_asset",
+        ),
+        re_path(
             r"report/([^/]+)/$",
             views.ReportCollectionView.as_view(),
             name="report collection",
@@ -58,9 +67,13 @@ tx_urlpatterns = (
             views.TranscriptionView.as_view(),
             name="transcription",
         ),
+        re_path(
+            r"^([^/]+)/([^/]+)/$", views.ConcordiaCollectionView.as_view(), name="project"
+        ),
     ],
     "transcriptions",
 )
+
 
 urlpatterns = [
     re_path(r"^$", TemplateView.as_view(template_name="home.html")),
@@ -103,12 +116,20 @@ urlpatterns = [
     re_path(r"^admin/", admin.site.urls),
     # Apps
     re_path(r"^forum/", include(board.urls)),
-
     # Web Services
-    # Form views
     re_path(r'^ws/page_in_use/(?P<page_url>(.*?))/$', views_ws.PageInUseGet.as_view()),
     re_path(r'^ws/page_in_use_update/(?P<page_url>(.*?))/$', views_ws.PageInUsePut.as_view()),
     re_path(r'^ws/page_in_use/$', views_ws.PageInUseCreate.as_view()),
+    re_path(r'^ws/page_in_use_user/(?P<user>(.*?))/(?P<page_url>(.*?))/$', views_ws.PageInUseUserGet.as_view()),
+    re_path(r'^ws/collection/(?P<slug>(.*?))/$', views_ws.CollectionGet().as_view()),
+    re_path(r'^ws/asset/(?P<collection>(.*?))/$', views_ws.AssetsList().as_view()),
+    re_path(r'^ws/asset_by_slug/(?P<collection>(.*?))/(?P<slug>(.*?))/$', views_ws.AssetBySlug().as_view()),
+    re_path(r'^ws/page_in_use_filter/(?P<user>(.*?))/(?P<page_url>(.*?))/$', views_ws.PageInUseFilteredGet.as_view()),
+    re_path(r'^ws/transcription/(?P<asset>(.*?))/$', views_ws.TranscriptionLastGet().as_view()),
+    re_path(r'^ws/transcription_create/$', views_ws.TranscriptionCreate().as_view()),
+    re_path(r'^ws/tags/(?P<asset>(.*?))/$', views_ws.UserAssetTagsGet().as_view()),
+    re_path(r'^ws/tag_create/$', views_ws.TagCreate.as_view()),
+
 ]
 
 urlpatterns += [
@@ -144,12 +165,17 @@ urlpatterns += [
     re_path(
         r"^check_and_save_collection_assets/(?P<task_id>[a-zA-Z0-9-]+)/(?P<item_id>[a-zA-Z0-9-]+)$",
         check_and_save_collection_assets,
-        name="check_and_save_collection_assets",
+        name="check_and_save_collection_item_assets",
     ),
     re_path(
         r"^check_and_save_collection_assets/(?P<task_id>[a-zA-Z0-9-]+)/$",
         check_and_save_collection_assets,
         name="check_and_save_collection_assets",
+    ),
+    re_path(
+        r"^filter/collections/$",
+        views.FilterCollections.as_view(),
+        name="filter_collections",
     ),
 ]
 
@@ -162,3 +188,7 @@ urlpatterns += [
 ]
 
 urlpatterns += [url("", include("django_prometheus_metrics.urls"))]
+
+urlpatterns += [
+    url(r'^captcha/', include('captcha.urls')),
+]
